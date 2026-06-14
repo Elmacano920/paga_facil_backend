@@ -6,6 +6,7 @@ import { AdvanceRequest } from './entities/advance-request.entity';
 import { EmployeesModule } from '../employees/employees.module';
 import { PayoutsModule } from '../payouts/payouts.module';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
     EmployeesModule,
     PayoutsModule,
     ConfigModule,
+    AuthModule,
   ],
   controllers: [AdvancesController],
   providers: [AdvancesService],

@@ -1,4 +1,4 @@
-# SueldoAlDía (PagaFácil) - API de Adelanto de Nómina B2B
+# `SueldoAlDía (PagaFácil) - API de Adelanto de Nómina B2B
 
 SueldoAlDía es una plataforma backend moderna de tecnología financiera (FinTech) que permite a empleados de empresas afiliadas solicitar adelantos de su sueldo acumulado quincenal bajo demanda. 
 

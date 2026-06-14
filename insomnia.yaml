@@ -1,12 +1,12 @@
 _type: export
 __export_format: 4
-__export_date: 2026-06-14T16:55:00.000Z
+__export_date: 2026-06-14T17:22:00.000Z
 __export_source: insomnia.desktop.app:v8.6.1
 resources:
   - _id: wrk_1
     _type: workspace
     name: SueldoAlDia API (PagaFacil)
-    description: Colección de peticiones para probar el API de adelantos de nómina SueldoAlDía.
+    description: Colección de peticiones para probar el API de adelantos de nómina SueldoAlDía con Autenticación de Cookies.
     parentId: null
   
   # Environment
@@ -20,11 +20,20 @@ resources:
     metaSortKey: 1700000000000
 
   # Folders
+  - _id: fld_auth
+    _type: request_group
+    parentId: wrk_1
+    name: Autenticación (Auth)
+    description: Registro, inicio y cierre de sesión con cookies HttpOnly
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1750000000000
+
   - _id: fld_companies
     _type: request_group
     parentId: wrk_1
     name: Empresas (Companies)
-    description: CRUD y depósitos para fondos de nómina B2B
+    description: CRUD y depósitos para fondos de nómina B2B (Requiere Admin o Company Admin)
     environment: {}
     environmentPropertyOrder: null
     metaSortKey: -1700000000000
@@ -33,7 +42,7 @@ resources:
     _type: request_group
     parentId: wrk_1
     name: Empleados (Employees)
-    description: Registro y consulta de acumulado quincenal
+    description: Registro y consulta de acumulado quincenal (Requiere autenticación)
     environment: {}
     environmentPropertyOrder: null
     metaSortKey: -1650000000000
@@ -42,10 +51,106 @@ resources:
     _type: request_group
     parentId: wrk_1
     name: Adelantos (Advances)
-    description: Aprobación y desembolso transaccional de adelantos
+    description: Aprobación y desembolso transaccional de adelantos (Requiere autenticación)
     environment: {}
     environmentPropertyOrder: null
     metaSortKey: -1600000000000
+
+  # Requests - Auth
+  - _id: req_login_admin
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/login"
+    name: Iniciar Sesión - Superadmin
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "email": "admin@pagafacil.com",
+          "password": "admin123"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1750000000000
+
+  - _id: req_login_company_admin
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/login"
+    name: Iniciar Sesión - Admin Empresa (Polar)
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "email": "admin@polar.com",
+          "password": "password123"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1740000000000
+
+  - _id: req_login_employee
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/login"
+    name: Iniciar Sesión - Empleado (Juan Pérez)
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "email": "juan@polar.com",
+          "password": "password123"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1730000000000
+
+  - _id: req_auth_me
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/me"
+    name: Obtener Perfil Actual (/auth/me)
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1720000000000
+
+  - _id: req_auth_logout
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/logout"
+    name: Cerrar Sesión (Logout)
+    method: POST
+    body: {}
+    headers: []
+    metaSortKey: -1710000000000
+
+  - _id: req_register_user
+    _type: request
+    parentId: fld_auth
+    url: "{{ _.base_url }}/auth/register"
+    name: Registrar Usuario
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "email": "test_user@polar.com",
+          "password": "password123",
+          "role": "employee",
+          "employeeId": "6278271b-2c7a-475c-8b94-e68473976a0f",
+          "companyId": "8c6b0210-607f-4a4e-b156-87df403cbcd3"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1700000000000
 
   # Requests - Companies
   - _id: req_create_company

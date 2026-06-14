@@ -5,10 +5,13 @@ import { CompaniesModule } from './modules/companies/companies.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { AdvancesModule } from './modules/advances/advances.module';
 import { PayoutsModule } from './modules/payouts/payouts.module';
+import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { Company } from './modules/companies/entities/company.entity';
 import { Employee } from './modules/employees/entities/employee.entity';
 import { AdvanceRequest } from './modules/advances/entities/advance-request.entity';
 import { Transaction } from './modules/payouts/entities/transaction.entity';
+import { User } from './modules/users/entities/user.entity';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 
@@ -27,7 +30,7 @@ import { AppController } from './app.controller';
         username: configService.get<string>('DATABASE_USER', 'postgres'),
         password: configService.get<string>('DATABASE_PASSWORD', 'postgrespassword'),
         database: configService.get<string>('DATABASE_NAME', 'sueldo_al_dia'),
-        entities: [Company, Employee, AdvanceRequest, Transaction],
+        entities: [Company, Employee, AdvanceRequest, Transaction, User],
         synchronize: configService.get<string>('DATABASE_SYNC') === 'true',
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
@@ -36,6 +39,8 @@ import { AppController } from './app.controller';
     EmployeesModule,
     AdvancesModule,
     PayoutsModule,
+    UsersModule,
+    AuthModule,
     TypeOrmModule.forFeature([Company, Employee]),
   ],
   controllers: [AppController],

@@ -25,8 +25,9 @@ export class EmployeesService {
     return this.employeeRepository.save(employee);
   }
 
-  async findAll(): Promise<Employee[]> {
-    return this.employeeRepository.find({ relations: ['company'] });
+  async findAll(companyId?: string): Promise<Employee[]> {
+    const where = companyId ? { companyId } : {};
+    return this.employeeRepository.find({ where, relations: ['company'] });
   }
 
   async findOne(id: string): Promise<Employee> {

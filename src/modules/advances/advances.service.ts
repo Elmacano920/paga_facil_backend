@@ -147,8 +147,10 @@ export class AdvancesService {
     }
   }
 
-  async findAll(): Promise<AdvanceRequest[]> {
+  async findAll(companyId?: string): Promise<AdvanceRequest[]> {
+    const where = companyId ? { employee: { companyId } } : {};
     return this.advanceRepository.find({
+      where,
       relations: ['employee', 'employee.company', 'transaction'],
       order: { requestDate: 'DESC' },
     });
