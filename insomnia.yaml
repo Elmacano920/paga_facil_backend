@@ -1,0 +1,212 @@
+_type: export
+__export_format: 4
+__export_date: 2026-06-14T16:55:00.000Z
+__export_source: insomnia.desktop.app:v8.6.1
+resources:
+  - _id: wrk_1
+    _type: workspace
+    name: SueldoAlDia API (PagaFacil)
+    description: Colección de peticiones para probar el API de adelantos de nómina SueldoAlDía.
+    parentId: null
+  
+  # Environment
+  - _id: env_1
+    _type: environment
+    parentId: wrk_1
+    name: Base Environment
+    data:
+      base_url: http://localhost:3001
+    isPrivate: false
+    metaSortKey: 1700000000000
+
+  # Folders
+  - _id: fld_companies
+    _type: request_group
+    parentId: wrk_1
+    name: Empresas (Companies)
+    description: CRUD y depósitos para fondos de nómina B2B
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1700000000000
+    
+  - _id: fld_employees
+    _type: request_group
+    parentId: wrk_1
+    name: Empleados (Employees)
+    description: Registro y consulta de acumulado quincenal
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1650000000000
+
+  - _id: fld_advances
+    _type: request_group
+    parentId: wrk_1
+    name: Adelantos (Advances)
+    description: Aprobación y desembolso transaccional de adelantos
+    environment: {}
+    environmentPropertyOrder: null
+    metaSortKey: -1600000000000
+
+  # Requests - Companies
+  - _id: req_create_company
+    _type: request
+    parentId: fld_companies
+    url: "{{ _.base_url }}/companies"
+    name: Crear Empresa
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "name": "Empresa Polar",
+          "rif": "J-00000001-0",
+          "payrollBalance": 10000.00
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1700000000000
+    
+  - _id: req_list_companies
+    _type: request
+    parentId: fld_companies
+    url: "{{ _.base_url }}/companies"
+    name: Listar Empresas
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1690000000000
+
+  - _id: req_get_company
+    _type: request
+    parentId: fld_companies
+    url: "{{ _.base_url }}/companies/8c6b0210-607f-4a4e-b156-87df403cbcd3"
+    name: Obtener Empresa por ID
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1680000000000
+
+  - _id: req_deposit_company
+    _type: request
+    parentId: fld_companies
+    url: "{{ _.base_url }}/companies/8c6b0210-607f-4a4e-b156-87df403cbcd3/deposit"
+    name: Depositar Fondos de Nómina
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "amount": 5000.00
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1670000000000
+
+  # Requests - Employees
+  - _id: req_create_employee
+    _type: request
+    parentId: fld_employees
+    url: "{{ _.base_url }}/employees"
+    name: Registrar Empleado
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "firstName": "Juan",
+          "lastName": "Pérez",
+          "documentId": "V-12345678",
+          "phone": "04125555555",
+          "bankCode": "0102",
+          "monthlySalary": 1200.00,
+          "companyId": "8c6b0210-607f-4a4e-b156-87df403cbcd3"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1700000000000
+
+  - _id: req_list_employees
+    _type: request
+    parentId: fld_employees
+    url: "{{ _.base_url }}/employees"
+    name: Listar Empleados
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1690000000000
+
+  - _id: req_get_employee
+    _type: request
+    parentId: fld_employees
+    url: "{{ _.base_url }}/employees/6278271b-2c7a-475c-8b94-e68473976a0f"
+    name: Obtener Empleado por ID
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1680000000000
+
+  - _id: req_payroll_status
+    _type: request
+    parentId: fld_employees
+    url: "{{ _.base_url }}/employees/6278271b-2c7a-475c-8b94-e68473976a0f/payroll-status"
+    name: Consultar Acumulado y Cupo Quincenal
+    method: GET
+    body: {}
+    parameters:
+      - name: date
+        value: "2026-06-10"
+        disabled: false
+    headers: []
+    metaSortKey: -1670000000000
+
+  # Requests - Advances
+  - _id: req_create_advance
+    _type: request
+    parentId: fld_advances
+    url: "{{ _.base_url }}/advances"
+    name: Solicitar Adelanto (ACID / Pago Móvil)
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+          "employeeId": "6278271b-2c7a-475c-8b94-e68473976a0f",
+          "amountRequested": 150.00
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    metaSortKey: -1700000000000
+
+  - _id: req_list_advances
+    _type: request
+    parentId: fld_advances
+    url: "{{ _.base_url }}/advances"
+    name: Listar Adelantos
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1690000000000
+
+  - _id: req_get_advance
+    _type: request
+    parentId: fld_advances
+    url: "{{ _.base_url }}/advances/some-advance-uuid-here"
+    name: Obtener Adelanto por ID
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1680000000000
+
+  - _id: req_health_check
+    _type: request
+    parentId: wrk_1
+    url: "{{ _.base_url }}/"
+    name: Health Check (Hello World)
+    method: GET
+    body: {}
+    headers: []
+    metaSortKey: -1800000000000
