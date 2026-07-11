@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CriptoMapa Venezuela</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">₿ CriptoMapa</div>
+    <span class="logo-sub">Directorio cripto Venezuela</span>
+  </header>
+
+  <!-- BARRA DE FILTROS -->
+  <div class="filtros">
+    <select id="filtro-red">
+      <option value="">Todas las redes</option>
+      <option value="TRC-20">TRC-20</option>
+      <option value="BEP-20">BEP-20</option>
+      <option value="Lightning">Lightning</option>
+    </select>
+
+    <select id="filtro-moneda">
+      <option value="">Todas las monedas</option>
+      <option value="USDT">USDT</option>
+      <option value="USDC">USDC</option>
+      <option value="BTC">BTC</option>
+      <option value="BNB">BNB</option>
+    </select>
+
+    <select id="filtro-radio">
+      <option value="1">1 km</option>
+      <option value="3">3 km</option>
+      <option value="5" selected>5 km</option>
+      <option value="10">10 km</option>
+      <option value="0">Sin límite</option>
+    </select>
+
+    <button id="btn-ubicacion">📍 Mi ubicación</button>
+
+    <span class="contador-wrap">
+      <span id="contador">0</span> encontrados
+    </span>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+    <div id="mapa"></div>
+
+    <aside class="panel">
+      <div class="panel-titulo">Comercios cercanos</div>
+      <ul id="lista" role="list">
+        <li class="hint">Activa tu ubicación para ver comercios cercanos</li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <button id="modal-cerrar" class="modal-cerrar">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
