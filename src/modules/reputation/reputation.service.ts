@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReputationScore, EntityType, ReputationTier } from './entities/reputation-score.entity';
-import { Review } from '../reviews/entities/review.entity';
-import { AdvanceRequest } from '../advances/entities/advance-request.entity';
-import { CashbackClaim } from '../cashback/entities/cashback-claim.entity';
+import { Review } from '../../modules/reviews/entities/review.entity';
+import { AdvanceRequest } from '../../modules/advances/entities/advance-request.entity';
+import { CashbackClaim } from '../../modules/cashback/entities/cashback-claim.entity';
 
 const TIERS: { name: ReputationTier; min: number; max: number; rate: number }[] = [
   { name: ReputationTier.BRONCE,  min: 0,  max: 24,  rate: 0.02 },
@@ -31,69 +31,37 @@ export class ReputationService {
     return TIERS.find(t => score >= t.min && score <= t.max) || TIERS[0];
   }
 
-  private clamp(val: number) { return Math.max(0, Math.min(100, val)); }
-  private normalize(val: number, max: number) { return max === 0 ? 0 : this.clamp((val / max) * 100); }
+  private clamp(v: number) { return Math.max(0, Math.min(100, v)); }
+  private normalize(v: number, max: number) { return max === 0 ? 0 : this.clamp((v / max) * 100); }
 
   async calculateCompanyScore(companyId: string): Promise<ReputationScore> {
     const reviews  = await this.reviewRepo.find({ where: { companyId } });
-    const advances = await this.advanceRepo.find({
-      where: { employee: { companyId } },
-      relations: ['employee'],
-    });
-    const claims = await this.cashbackRepo.find({
-      where: { employee: { companyId } },
-      relations: ['employee'],
-    });
+    const advances = await this.advanceRepo.find({ where: { employee: { companyId } }, relations: ['employee'] });
+    const claims   = await this.cashbackRepo.find({ where: { employee: { companyId } }, relations: ['employee'] });
 
-    // Factor 1: Average review rating weighted by recency (40%)
-    let reviewScore = 50;
-    let reviewWeight = 0.10;
+    let reviewScore = 50; let reviewWeight = 0.10;
     if (reviews.length > 0) {
       const DECAY = 30 * 24 * 60 * 60 * 1000;
       let ws = 0, wt = 0;
       for (const r of reviews) {
-        const age = Date.now() - new Date(r.createdAt).getTime();
-        const w = Math.exp(-Math.LN2 * age / DECAY);
-        ws += r.rating * w;
-        wt += w;
+        const w = Math.exp(-Math.LN2 * (Date.now() - new Date(r.createdAt).getTime()) / DECAY);
+        ws += r.rating * w; wt += w;
       }
       reviewScore = ((wt > 0 ? ws / wt : 1) - 1) / 4 * 100;
       reviewWeight = 0.40;
     }
 
-    // Factor 2: Confirmed advances count (20%)
     const txScore = this.normalize(advances.length, 100);
+    const sorted  = [...advances].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const ageDays = sorted[0] ? (Date.now() - new Date(sorted[0].createdAt).getTime()) / 86400000 : 0;
+    const ageScore     = this.normalize(ageDays, 365);
+    const cashbackRate = advances.length > 0 ? (claims.length / advances.length) * 100 : 50;
+    const disbursed    = advances.filter(a => a.status === ('DISBURSED' as any)).length;
+    const disputeScore = advances.length > 0 ? (disbursed / advances.length) * 100 : 70;
 
-    // Factor 3: Platform age in days from first advance (15%)
-    const sorted = [...advances].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-    const ageDays = sorted[0]
-      ? (Date.now() - new Date(sorted[0].createdAt).getTime()) / 86400000
-      : 0;
-    const ageScore = this.normalize(ageDays, 365);
-
-    // Factor 4: Cashback acceptance rate (15%)
-    const cashbackRate = advances.length > 0
-      ? (claims.length / advances.length) * 100
-      : 50;
-
-    // Factor 5: DISBURSED ratio as dispute proxy (10%)
-    const disbursed = advances.filter(a => a.status === 'DISBURSED' as any).length;
-    const disputeScore = advances.length > 0
-      ? (disbursed / advances.length) * 100
-      : 70;
-
-    const score = this.clamp(
-      Math.round(
-        reviewScore  * reviewWeight +
-        txScore      * 0.20 +
-        ageScore     * 0.15 +
-        cashbackRate * 0.15 +
-        disputeScore * 0.10,
-      ),
-    );
-
+    const score = this.clamp(Math.round(
+      reviewScore * reviewWeight + txScore * 0.20 + ageScore * 0.15 + cashbackRate * 0.15 + disputeScore * 0.10,
+    ));
     const tier = this.getTier(score);
     const breakdown = {
       reviews:      { score: Math.round(reviewScore),  weight: reviewWeight, contribution: Math.round(reviewScore  * reviewWeight) },
@@ -102,7 +70,6 @@ export class ReputationService {
       cashbacks:    { score: Math.round(cashbackRate), weight: 0.15,         contribution: Math.round(cashbackRate * 0.15) },
       disputes:     { score: Math.round(disputeScore), weight: 0.10,         contribution: Math.round(disputeScore * 0.10) },
     };
-
     return this.upsertScore(companyId, EntityType.COMPANY, score, tier.name, breakdown);
   }
 
@@ -111,42 +78,20 @@ export class ReputationService {
     const advances = await this.advanceRepo.find({ where: { employeeId } });
     const claims   = await this.cashbackRepo.find({ where: { employeeId } });
 
-    // Factor 1: Reviews written (30%)
     const reviewCountScore = this.normalize(reviews.length, 20);
+    const totalVolume      = advances.reduce((s, a) => s + Number(a.amountRequested), 0);
+    const volumeScore      = this.normalize(totalVolume, 5000);
+    const sorted           = [...advances].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    const ageDays          = sorted[0] ? (Date.now() - new Date(sorted[0].createdAt).getTime()) / 86400000 : 0;
+    const ageScore         = this.normalize(ageDays, 365);
+    const totalHelpful     = reviews.reduce((s, r) => s + (r.helpful || 0), 0);
+    const totalVotes       = reviews.reduce((s, r) => s + (r.helpful || 0) + (r.notHelpful || 0), 0);
+    const helpfulRatio     = totalVotes > 0 ? (totalHelpful / totalVotes) * 100 : 50;
+    const claimRate        = advances.length > 0 ? (claims.length / advances.length) * 100 : 70;
 
-    // Factor 2: Total advance volume (25%)
-    const totalVolume = advances.reduce((s, a) => s + Number(a.amountRequested), 0);
-    const volumeScore = this.normalize(totalVolume, 5000);
-
-    // Factor 3: Platform age (20%)
-    const sorted = [...advances].sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    );
-    const ageDays = sorted[0]
-      ? (Date.now() - new Date(sorted[0].createdAt).getTime()) / 86400000
-      : 0;
-    const ageScore = this.normalize(ageDays, 365);
-
-    // Factor 4: Helpful vote ratio on reviews (15%)
-    const totalHelpful = reviews.reduce((s, r) => s + (r.helpful || 0), 0);
-    const totalVotes   = reviews.reduce((s, r) => s + (r.helpful || 0) + (r.notHelpful || 0), 0);
-    const helpfulRatio = totalVotes > 0 ? (totalHelpful / totalVotes) * 100 : 50;
-
-    // Factor 5: Cashback claim rate (10%)
-    const claimRate = advances.length > 0
-      ? (claims.length / advances.length) * 100
-      : 70;
-
-    const score = this.clamp(
-      Math.round(
-        reviewCountScore * 0.30 +
-        volumeScore      * 0.25 +
-        ageScore         * 0.20 +
-        helpfulRatio     * 0.15 +
-        claimRate        * 0.10,
-      ),
-    );
-
+    const score = this.clamp(Math.round(
+      reviewCountScore * 0.30 + volumeScore * 0.25 + ageScore * 0.20 + helpfulRatio * 0.15 + claimRate * 0.10,
+    ));
     const tier = this.getTier(score);
     const breakdown = {
       reviews:     { score: Math.round(reviewCountScore), weight: 0.30, contribution: Math.round(reviewCountScore * 0.30) },
@@ -155,23 +100,13 @@ export class ReputationService {
       helpfulness: { score: Math.round(helpfulRatio),     weight: 0.15, contribution: Math.round(helpfulRatio     * 0.15) },
       cashbacks:   { score: Math.round(claimRate),        weight: 0.10, contribution: Math.round(claimRate        * 0.10) },
     };
-
     return this.upsertScore(employeeId, EntityType.EMPLOYEE, score, tier.name, breakdown);
   }
 
-  private async upsertScore(
-    entityId: string,
-    entityType: EntityType,
-    score: number,
-    tier: ReputationTier,
-    breakdown: Record<string, any>,
-  ): Promise<ReputationScore> {
+  private async upsertScore(entityId: string, entityType: EntityType, score: number, tier: ReputationTier, breakdown: Record<string, any>): Promise<ReputationScore> {
     let record = await this.scoreRepo.findOne({ where: { entityId, entityType } });
     if (record) {
-      record.score       = score;
-      record.tier        = tier;
-      record.breakdown   = breakdown;
-      record.lastUpdated = new Date();
+      record.score = score; record.tier = tier; record.breakdown = breakdown; record.lastUpdated = new Date();
     } else {
       record = this.scoreRepo.create({ entityId, entityType, score, tier, breakdown, lastUpdated: new Date() });
     }
@@ -183,11 +118,11 @@ export class ReputationService {
   }
 
   getScoreBadge(score: number) {
-    if (score >= 90) return { label: 'Elite',   color: '#a78bfa', emoji: '⭐', cashbackRate: '15%' };
-    if (score >= 75) return { label: 'Platino', color: '#E5E4E2', emoji: '💎', cashbackRate: '12%' };
-    if (score >= 50) return { label: 'Oro',     color: '#FFD700', emoji: '🥇', cashbackRate: '8%'  };
-    if (score >= 25) return { label: 'Plata',   color: '#C0C0C0', emoji: '🥈', cashbackRate: '5%'  };
-    return               { label: 'Bronce',   color: '#cd7f32', emoji: '🥉', cashbackRate: '2%'  };
+    if (score >= 90) return { label: 'Elite',   color: '#a78bfa', emoji: 'E', cashbackRate: '15%' };
+    if (score >= 75) return { label: 'Platino', color: '#E5E4E2', emoji: 'P', cashbackRate: '12%' };
+    if (score >= 50) return { label: 'Oro',     color: '#FFD700', emoji: 'O', cashbackRate: '8%'  };
+    if (score >= 25) return { label: 'Plata',   color: '#C0C0C0', emoji: 'S', cashbackRate: '5%'  };
+    return               { label: 'Bronce',   color: '#cd7f32', emoji: 'B', cashbackRate: '2%'  };
   }
 
   getAllTiers() { return TIERS; }
