@@ -1,0 +1,60 @@
+# render.yaml — Configuración de despliegue para Render.com
+# Proyecto: PagaFácil Backend + Frontend
+
+services:
+  # ── BACKEND (NestJS + TypeORM) ─────────────────────────────────
+  - type: web
+    name: pagafacil-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: pagafacil-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: pagafacil-db
+          property: port
+      - key: DATABASE_USER
+        fromDatabase:
+          name: pagafacil-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: pagafacil-db
+          property: password
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: pagafacil-db
+          property: database
+      - key: DATABASE_SYNC
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # ── FRONTEND (Node.js demo server) ─────────────────────────────
+  - type: web
+    name: pagafacil-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: echo "No build needed"
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+
+# ── BASE DE DATOS PostgreSQL ────────────────────────────────────
+databases:
+  - name: pagafacil-db
+    plan: free
+    databaseName: paga_facil
+    user: pagafacil_user

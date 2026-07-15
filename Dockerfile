@@ -1,24 +1,29 @@
-# Montar
+# ── STAGE 1: Build ─────────────────────────────────────────────
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copiamos todo el contenido local (incluyendo node_modules de tu máquina)
+# Instalar dependencias primero (capa cacheada)
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --ignore-scripts
+
+# Copiar código fuente y compilar
 COPY . .
+RUN pnpm run build
 
-# Compilamos la aplicación NestJS
-RUN npm run build
-
-# correr
+# ── STAGE 2: Production runner ──────────────────────────────────
 FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Copiamos la aplicación compilada y el node_modules ya listos desde la etapa anterior
+ENV NODE_ENV=production
+
+# Solo dependencias de producción
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile --prod --ignore-scripts
+
+# Copiar build compilado
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.env* ./
-COPY package.json ./
 
 EXPOSE 3001
 

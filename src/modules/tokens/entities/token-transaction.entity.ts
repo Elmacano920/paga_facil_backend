@@ -34,7 +34,7 @@ export class TokenTransaction extends BaseEntity {
   reason: string;
 
   @Column({ type: 'uuid', nullable: true })
-  txRef: string;
+  txRef: string | null;
 
   @Column({
     type: 'decimal',
