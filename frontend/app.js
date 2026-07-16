@@ -1,9 +1,17 @@
 // ══════════════════════════════════════════════════════════
 //  PagaFácil Dashboard — app.js
-//  Conecta al servidor en localhost:3001 (node server.js)
 // ══════════════════════════════════════════════════════════
 
-const API  = 'http://localhost:3001';
+// Detecta automáticamente si está en producción o local
+const API = (() => {
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return 'http://localhost:3001';               // Desarrollo local
+  }
+  // Producción: backend en Render
+  return 'https://pagafacil-backend.onrender.com';
+})();
+
 let apiOnline = false;
 let map = null;
 let mapMarkers = [];
