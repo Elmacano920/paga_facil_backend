@@ -434,7 +434,7 @@ async function checkApi() {
   const el    = document.getElementById('api-status');
   const badge = document.getElementById('demo-badge');
   try {
-    const res = await fetch(API + '/health', { signal: AbortSignal.timeout(2000) });
+    const res = await fetch(API + '/', { signal: AbortSignal.timeout(5000) });
     if (res.ok) {
       apiOnline = true;
       el.textContent = '⬤ Servidor Online';
