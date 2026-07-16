@@ -1,0 +1,18 @@
+# Netlify configuration for PagaFácil Frontend
+[build]
+  base    = "frontend"
+  publish = "frontend"
+  command = "echo 'Static site - no build needed'"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+
+# Redirect all routes to index.html (SPA behavior)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
