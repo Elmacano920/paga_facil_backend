@@ -7,6 +7,13 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+
+    // GET requests are public — skip role verification
+    if (request.method === 'GET') {
+      return true;
+    }
+
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>('roles', [
       context.getHandler(),
       context.getClass(),
@@ -15,7 +22,6 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
     const user = request.user;
     if (!user) {
       throw new ForbiddenException('Acceso denegado: usuario no autenticado');
