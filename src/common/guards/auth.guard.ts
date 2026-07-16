@@ -11,6 +11,13 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+
+    // GET requests are public — no authentication required (read-only access)
+    if (request.method === 'GET') {
+      return true;
+    }
+
+    // All other methods (POST, PUT, PATCH, DELETE) require JWT authentication
     const cookies = request.headers.cookie;
     if (!cookies) {
       throw new UnauthorizedException('Acceso no autorizado: no se encontró la cookie de sesión');
