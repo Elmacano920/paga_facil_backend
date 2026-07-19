@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PagaFácil — Panel de Control</title>
+  <meta name="description" content="Sistema de adelantos salariales, reputación LTK y cashback cripto en Venezuela"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ═══ ANIMATED BG ═══ -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div>
+      <div class="logo-name">PagaFácil</div>
+      <div class="logo-sub">Panel de Control</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section-label">Principal</div>
+  <nav-item id="nav-dashboard" class="nav-item active" onclick="navigate('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Dashboard</span>
+    <div class="nav-badge" id="badge-dashboard"></div>
+  </nav-item>
+  <nav-item id="nav-companies" class="nav-item" onclick="navigate('companies')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>
+    <span>Empresas</span>
+  </nav-item>
+  <nav-item id="nav-employees" class="nav-item" onclick="navigate('employees')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    <span>Empleados</span>
+  </nav-item>
+  <nav-item id="nav-advances" class="nav-item" onclick="navigate('advances')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+    <span>Adelantos</span>
+  </nav-item>
+
+  <div class="sidebar-section-label" style="margin-top:12px">Ecosistema LTK</div>
+  <nav-item id="nav-reputation" class="nav-item" onclick="navigate('reputation')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Reputación</span>
+  </nav-item>
+  <nav-item id="nav-tokens" class="nav-item" onclick="navigate('tokens')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    <span>Tokens LTK</span>
+    <div class="nav-badge nav-badge-purple">LTK</div>
+  </nav-item>
+  <nav-item id="nav-cashback" class="nav-item" onclick="navigate('cashback')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+    <span>Cashback</span>
+  </nav-item>
+  <nav-item id="nav-reviews" class="nav-item" onclick="navigate('reviews')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <span>Reseñas</span>
+  </nav-item>
+
+  <div class="sidebar-section-label" style="margin-top:12px">Descubrimiento</div>
+  <nav-item id="nav-map" class="nav-item" onclick="navigate('map')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span>CriptoMapa</span>
+    <div class="nav-badge nav-badge-cyan">LIVE</div>
+  </nav-item>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar">N</div>
+      <div>
+        <div class="user-name">nestoe1235</div>
+        <div class="user-role">Owner · paga_facil</div>
+      </div>
+    </div>
+    <div id="api-status" class="api-status offline">⬤ Offline</div>
+  </div>
+</nav>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main class="main" id="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="page-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="demo-badge" id="demo-badge">DEMO MODE</div>
+      <div class="topbar-time" id="topbar-time"></div>
+    </div>
+  </header>
+
+  <!-- ══════ PAGE: DASHBOARD ══════ -->
+  <section class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card" style="--accent:#8b5cf6">
+        <div class="stat-icon" style="background:rgba(139,92,246,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Empresas Activas</div>
+          <div class="stat-value" data-count="47">0</div>
+          <div class="stat-change positive">+3 este mes</div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 80 30" fill="none"><polyline points="0,25 15,20 30,22 45,15 60,12 75,8" stroke="#8b5cf6" stroke-width="2" fill="none" opacity=".7"/><polyline points="0,25 15,20 30,22 45,15 60,12 75,8 75,30 0,30" fill="rgba(139,92,246,.1)"/></svg>
+      </div>
+
+      <div class="stat-card" style="--accent:#22d3ee">
+        <div class="stat-icon" style="background:rgba(34,211,238,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Empleados Activos</div>
+          <div class="stat-value" data-count="342">0</div>
+          <div class="stat-change positive">+28 este mes</div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 80 30" fill="none"><polyline points="0,28 15,24 30,18 45,20 60,14 75,10" stroke="#22d3ee" stroke-width="2" fill="none" opacity=".7"/><polyline points="0,28 15,24 30,18 45,20 60,14 75,10 75,30 0,30" fill="rgba(34,211,238,.1)"/></svg>
+      </div>
+
+      <div class="stat-card" style="--accent:#f59e0b">
+        <div class="stat-icon" style="background:rgba(245,158,11,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Adelantos del Mes</div>
+          <div class="stat-value" data-count="128">0</div>
+          <div class="stat-change positive">+$18,450 USD</div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 80 30" fill="none"><polyline points="0,22 15,25 30,15 45,18 60,10 75,6" stroke="#f59e0b" stroke-width="2" fill="none" opacity=".7"/><polyline points="0,22 15,25 30,15 45,18 60,10 75,6 75,30 0,30" fill="rgba(245,158,11,.1)"/></svg>
+      </div>
+
+      <div class="stat-card" style="--accent:#10b981">
+        <div class="stat-icon" style="background:rgba(16,185,129,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Tokens LTK en Circulación</div>
+          <div class="stat-value" data-count="24580">0</div>
+          <div class="stat-change positive">+1,240 hoy</div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 80 30" fill="none"><polyline points="0,26 15,22 30,25 45,16 60,12 75,5" stroke="#10b981" stroke-width="2" fill="none" opacity=".7"/><polyline points="0,26 15,22 30,25 45,16 60,12 75,5 75,30 0,30" fill="rgba(16,185,129,.1)"/></svg>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Reputation Distribution -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Distribución de Reputación</h3>
+          <span class="card-badge">342 empleados</span>
+        </div>
+        <div class="tier-bars">
+          <div class="tier-row">
+            <span class="tier-label elite">Elite</span>
+            <div class="tier-bar-wrap"><div class="tier-bar" style="width:8%;background:linear-gradient(90deg,#7c3aed,#06b6d4)"></div></div>
+            <span class="tier-pct">8%</span>
+          </div>
+          <div class="tier-row">
+            <span class="tier-label platino">Platino</span>
+            <div class="tier-bar-wrap"><div class="tier-bar" style="width:17%;background:linear-gradient(90deg,#94a3b8,#e2e8f0)"></div></div>
+            <span class="tier-pct">17%</span>
+          </div>
+          <div class="tier-row">
+            <span class="tier-label oro">Oro</span>
+            <div class="tier-bar-wrap"><div class="tier-bar" style="width:29%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+            <span class="tier-pct">29%</span>
+          </div>
+          <div class="tier-row">
+            <span class="tier-label plata">Plata</span>
+            <div class="tier-bar-wrap"><div class="tier-bar" style="width:31%;background:linear-gradient(90deg,#64748b,#94a3b8)"></div></div>
+            <span class="tier-pct">31%</span>
+          </div>
+          <div class="tier-row">
+            <span class="tier-label bronce">Bronce</span>
+            <div class="tier-bar-wrap"><div class="tier-bar" style="width:15%;background:linear-gradient(90deg,#92400e,#b45309)"></div></div>
+            <span class="tier-pct">15%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Actividad Reciente</h3>
+          <button class="btn-ghost" onclick="navigate('advances')">Ver todo →</button>
+        </div>
+        <div class="activity-list" id="activity-list">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- Cashback Summary -->
+      <div class="card cashback-summary-card">
+        <div class="card-header">
+          <h3>Resumen Cashback</h3>
+          <span class="card-badge green">Activo</span>
+        </div>
+        <div class="cashback-rings">
+          <div class="ring-stat">
+            <svg viewBox="0 0 80 80" class="ring-svg">
+              <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+              <circle cx="40" cy="40" r="30" fill="none" stroke="#10b981" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.4" stroke-dashoffset="56.5" transform="rotate(-90 40 40)"/>
+            </svg>
+            <div class="ring-label"><span class="ring-val">70%</span><small>Tasa reclamo</small></div>
+          </div>
+          <div class="ring-stats-list">
+            <div class="ring-stat-row">
+              <span>Total reclamado</span><strong>$3,240 USD</strong>
+            </div>
+            <div class="ring-stat-row">
+              <span>Tokens emitidos</span><strong>8,450 LTK</strong>
+            </div>
+            <div class="ring-stat-row">
+              <span>Tasa promedio</span><strong>7.2%</strong>
+            </div>
+            <div class="ring-stat-row">
+              <span>Primer uso bonus</span><strong>+25 LTK</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Token Flow -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Flujo de Tokens LTK</h3>
+          <span class="card-badge purple">Hoy</span>
+        </div>
+        <div class="token-flow">
+          <div class="flow-col">
+            <div class="flow-icon mint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></div>
+            <div class="flow-val mint">+1,240</div>
+            <div class="flow-lab">Mint (Cashback)</div>
+          </div>
+          <div class="flow-divider"></div>
+          <div class="flow-col">
+            <div class="flow-icon burn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></div>
+            <div class="flow-val burn">-320</div>
+            <div class="flow-lab">Burn (Canjeos)</div>
+          </div>
+          <div class="flow-divider"></div>
+          <div class="flow-col">
+            <div class="flow-icon transfer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3L4 7l4 4M4 7h16M16 21l4-4-4-4M20 17H4"/></svg></div>
+            <div class="flow-val transfer">85</div>
+            <div class="flow-lab">Transferencias</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: REPUTACIÓN ══════ -->
+  <section class="page" id="page-reputation">
+    <div class="tiers-showcase">
+      <div class="tier-card" style="--t-color:#7c3aed;--t-color2:#06b6d4">
+        <div class="tier-card-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="url(#gElite)" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="35.8" transform="rotate(-90 50 50)"/>
+            <defs><linearGradient id="gElite" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+          </svg>
+          <div class="tier-card-icon">⚡</div>
+        </div>
+        <div class="tier-card-name elite">Elite</div>
+        <div class="tier-card-score">90 – 100</div>
+        <div class="tier-card-rate">15% Cashback</div>
+        <div class="tier-card-count">27 empleados</div>
+      </div>
+
+      <div class="tier-card" style="--t-color:#a3b8cc;--t-color2:#e2e8f0">
+        <div class="tier-card-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="url(#gPlatino)" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="71.6" transform="rotate(-90 50 50)"/>
+            <defs><linearGradient id="gPlatino" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#a3b8cc"/><stop offset="100%" stop-color="#e2e8f0"/></linearGradient></defs>
+          </svg>
+          <div class="tier-card-icon">💠</div>
+        </div>
+        <div class="tier-card-name platino">Platino</div>
+        <div class="tier-card-score">75 – 89</div>
+        <div class="tier-card-rate">12% Cashback</div>
+        <div class="tier-card-count">58 empleados</div>
+      </div>
+
+      <div class="tier-card" style="--t-color:#f59e0b;--t-color2:#fbbf24">
+        <div class="tier-card-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="url(#gOro)" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="107.5" transform="rotate(-90 50 50)"/>
+            <defs><linearGradient id="gOro" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient></defs>
+          </svg>
+          <div class="tier-card-icon">🥇</div>
+        </div>
+        <div class="tier-card-name oro">Oro</div>
+        <div class="tier-card-score">50 – 74</div>
+        <div class="tier-card-rate">8% Cashback</div>
+        <div class="tier-card-count">99 empleados</div>
+      </div>
+
+      <div class="tier-card" style="--t-color:#64748b;--t-color2:#94a3b8">
+        <div class="tier-card-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="url(#gPlata)" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="143.3" transform="rotate(-90 50 50)"/>
+            <defs><linearGradient id="gPlata" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#64748b"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient></defs>
+          </svg>
+          <div class="tier-card-icon">🥈</div>
+        </div>
+        <div class="tier-card-name plata">Plata</div>
+        <div class="tier-card-score">25 – 49</div>
+        <div class="tier-card-rate">5% Cashback</div>
+        <div class="tier-card-count">106 empleados</div>
+      </div>
+
+      <div class="tier-card" style="--t-color:#92400e;--t-color2:#b45309">
+        <div class="tier-card-ring">
+          <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="url(#gBronce)" stroke-width="8" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="179.1" transform="rotate(-90 50 50)"/>
+            <defs><linearGradient id="gBronce" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#92400e"/><stop offset="100%" stop-color="#b45309"/></linearGradient></defs>
+          </svg>
+          <div class="tier-card-icon">🥉</div>
+        </div>
+        <div class="tier-card-name bronce">Bronce</div>
+        <div class="tier-card-score">0 – 24</div>
+        <div class="tier-card-rate">2% Cashback</div>
+        <div class="tier-card-count">52 empleados</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-header"><h3>Top 10 Empleados por Reputación</h3><span class="card-badge">Score Global</span></div>
+      <table class="data-table" id="reputation-table">
+        <thead><tr><th>#</th><th>Empleado</th><th>Empresa</th><th>Score</th><th>Tier</th><th>Cashback Rate</th></tr></thead>
+        <tbody id="reputation-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: TOKENS LTK ══════ -->
+  <section class="page" id="page-tokens">
+    <div class="wallet-hero">
+      <div class="wallet-card">
+        <div class="wallet-card-glow"></div>
+        <div class="wallet-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M2 10h20"/></svg>
+        </div>
+        <div class="wallet-label">Suministro Total LTK</div>
+        <div class="wallet-balance"><span class="counter" data-count="24580">0</span> <span class="wallet-unit">LTK</span></div>
+        <div class="wallet-sub">Loyalty Token — Plataforma PagaFácil</div>
+        <div class="wallet-chips-row">
+          <div class="wallet-chip-stat">
+            <div>Acuñados</div>
+            <strong>32,100</strong>
+          </div>
+          <div class="wallet-chip-divider"></div>
+          <div class="wallet-chip-stat">
+            <div>Quemados</div>
+            <strong>7,520</strong>
+          </div>
+          <div class="wallet-chip-divider"></div>
+          <div class="wallet-chip-stat">
+            <div>Wallets</div>
+            <strong>342</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="wallet-info-col">
+        <div class="card">
+          <div class="card-header"><h3>¿Cómo ganar LTK?</h3></div>
+          <div class="earn-list">
+            <div class="earn-row"><div class="earn-icon" style="background:rgba(139,92,246,.2);color:#8b5cf6">%</div><div><strong>Cashback</strong><small>+5 LTK por cada adelanto reclamado</small></div></div>
+            <div class="earn-row"><div class="earn-icon" style="background:rgba(245,158,11,.2);color:#f59e0b">★</div><div><strong>Reseña Verificada</strong><small>+10 LTK por reseña aprobada</small></div></div>
+            <div class="earn-row"><div class="earn-icon" style="background:rgba(34,211,238,.2);color:#22d3ee">🎁</div><div><strong>Primer Uso Mensual</strong><small>+25 LTK bonus en el primer cashback del mes</small></div></div>
+            <div class="earn-row"><div class="earn-icon" style="background:rgba(16,185,129,.2);color:#10b981">↑</div><div><strong>Subida de Tier</strong><small>+50 LTK al alcanzar Platino o Elite</small></div></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="card-header"><h3>Distribución por Causa</h3></div>
+          <div class="token-dist">
+            <div class="dist-row"><span>Cashback</span><div class="dist-bar-w"><div class="dist-bar" style="width:58%;background:#8b5cf6"></div></div><span>58%</span></div>
+            <div class="dist-row"><span>Reseñas</span><div class="dist-bar-w"><div class="dist-bar" style="width:22%;background:#22d3ee"></div></div><span>22%</span></div>
+            <div class="dist-row"><span>Bonus Mensual</span><div class="dist-bar-w"><div class="dist-bar" style="width:12%;background:#f59e0b"></div></div><span>12%</span></div>
+            <div class="dist-row"><span>Tier Upgrade</span><div class="dist-bar-w"><div class="dist-bar" style="width:8%;background:#10b981"></div></div><span>8%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-header"><h3>Últimas Transacciones LTK</h3><span class="card-badge purple">En tiempo real</span></div>
+      <table class="data-table">
+        <thead><tr><th>Tipo</th><th>Empleado</th><th>Cantidad</th><th>Razón</th><th>Fecha</th></tr></thead>
+        <tbody id="token-tx-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: CASHBACK ══════ -->
+  <section class="page" id="page-cashback">
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card" style="--accent:#10b981">
+        <div class="stat-icon" style="background:rgba(16,185,129,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Total Reclamado</div>
+          <div class="stat-value" data-count="89">0</div>
+          <div class="stat-change">reclamos exitosos</div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent:#f59e0b">
+        <div class="stat-icon" style="background:rgba(245,158,11,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">USD Devueltos</div>
+          <div class="stat-value">$3,240</div>
+          <div class="stat-change positive">en cashback total</div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent:#8b5cf6">
+        <div class="stat-icon" style="background:rgba(139,92,246,.15)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+        </div>
+        <div class="stat-body">
+          <div class="stat-label">Tokens Emitidos</div>
+          <div class="stat-value" data-count="8450">0</div>
+          <div class="stat-change">LTK por cashback</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-header"><h3>Condiciones de Validación</h3><span class="card-badge green">Motor de Reglas</span></div>
+      <div class="conditions-grid">
+        <div class="condition-card">
+          <div class="cond-icon ok">✓</div>
+          <strong>Adelanto DISBURSED</strong>
+          <small>El adelanto debe estar en estado <code>DISBURSED</code></small>
+        </div>
+        <div class="condition-card">
+          <div class="cond-icon ok">✓</div>
+          <strong>Transacción SUCCESS</strong>
+          <small>La transferencia bancaria debe ser exitosa</small>
+        </div>
+        <div class="condition-card">
+          <div class="cond-icon ok">✓</div>
+          <strong>Ventana de 48h</strong>
+          <small>El reclamo debe hacerse dentro de 48 horas del pago</small>
+        </div>
+        <div class="condition-card">
+          <div class="cond-icon ok">✓</div>
+          <strong>Sin Doble Reclamo</strong>
+          <small>Cada adelanto solo puede reclamarse una vez</small>
+        </div>
+        <div class="condition-card">
+          <div class="cond-icon ok">✓</div>
+          <strong>Monto Mínimo $1</strong>
+          <small>El adelanto debe ser de al menos $1 USD</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div class="card-header"><h3>Historial de Reclamos</h3></div>
+      <table class="data-table">
+        <thead><tr><th>Empleado</th><th>Adelanto</th><th>Cashback $</th><th>Tier</th><th>Rate</th><th>LTK</th><th>Fecha</th></tr></thead>
+        <tbody id="cashback-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: CRIPTOMAPA ══════ -->
+  <section class="page" id="page-map">
+    <!-- MODAL QR -->
+    <div id="qr-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center">
+      <div style="background:#161b22;border:1px solid #30363d;border-radius:20px;padding:28px;width:100%;max-width:380px;position:relative;max-height:90vh;overflow-y:auto">
+        <button onclick="cerrarQRModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer">✕</button>
+        <div id="qr-modal-body"></div>
+      </div>
+    </div>
+
+    <div class="map-layout">
+      <div class="map-sidebar-panel">
+        <h3 class="map-panel-title">CriptoMapa Venezuela 🗺️</h3>
+        <p class="map-panel-sub">Comercios que aceptan cripto — filtrar por red</p>
+
+        <div class="map-filters" style="margin-bottom:12px">
+          <div class="filter-label">Red de pago:</div>
+          <div class="filter-chips" id="network-filters">
+            <button class="chip active" onclick="filterMap('all',this)">Todos</button>
+            <button class="chip" onclick="filterMap('TRC-20',this)">TRC-20</button>
+            <button class="chip" onclick="filterMap('BEP-20',this)">BEP-20</button>
+            <button class="chip" onclick="filterMap('Lightning',this)">Lightning</button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <button id="btn-gps" onclick="activarGPS()"
+            style="width:100%;padding:9px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);border-radius:10px;cursor:pointer;font-weight:600;font-size:.85rem">
+            📍 Usar mi ubicación GPS
+          </button>
+        </div>
+
+        <div class="map-commerce-list" id="map-commerce-list"></div>
+      </div>
+
+      <div class="map-container">
+        <div id="leaflet-map"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: COMPANIES ══════ -->
+  <section class="page" id="page-companies">
+    <div class="card">
+      <div class="card-header">
+        <h3>🏢 Empresas Registradas</h3>
+        <span class="card-badge" id="companies-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Empresa</th><th>Ciudad</th><th>Empleados</th><th>Tier</th><th>Estado</th></tr></thead>
+          <tbody id="companies-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: EMPLOYEES ══════ -->
+  <section class="page" id="page-employees">
+    <div class="card">
+      <div class="card-header">
+        <h3>👥 Empleados Activos</h3>
+        <span class="card-badge" id="employees-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Nombre</th><th>Empresa</th><th>Salario Base</th><th>Tier</th><th>Tokens LTK</th></tr></thead>
+          <tbody id="employees-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: ADVANCES ══════ -->
+  <section class="page" id="page-advances">
+    <div class="card">
+      <div class="card-header">
+        <h3>💳 Adelantos Salariales</h3>
+        <span class="card-badge" id="advances-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Empleado</th><th>Empresa</th><th>Monto (USD)</th><th>Estado</th><th>Fecha</th></tr></thead>
+          <tbody id="advances-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: REVIEWS ══════ -->
+  <section class="page" id="page-reviews">
+    <div class="card">
+      <div class="card-header">
+        <h3>💬 Sistema de Reseñas</h3>
+        <span class="card-badge" id="reviews-count">Cargando...</span>
+      </div>
+      <div id="reviews-list" style="display:grid;gap:14px;padding:4px">
+        <div style="text-align:center;padding:30px;color:#64748b">⏳ Cargando reseñas del backend...</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
