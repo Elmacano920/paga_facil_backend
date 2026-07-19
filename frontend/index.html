@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -491,32 +493,111 @@
 
   <!-- ══════ PAGE: CRIPTOMAPA ══════ -->
   <section class="page" id="page-map">
+    <!-- MODAL QR -->
+    <div id="qr-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center">
+      <div style="background:#161b22;border:1px solid #30363d;border-radius:20px;padding:28px;width:100%;max-width:380px;position:relative;max-height:90vh;overflow-y:auto">
+        <button onclick="cerrarQRModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#8b949e;font-size:20px;cursor:pointer">✕</button>
+        <div id="qr-modal-body"></div>
+      </div>
+    </div>
+
     <div class="map-layout">
       <div class="map-sidebar-panel">
-        <h3 class="map-panel-title">Comercios Cripto 🗺️</h3>
-        <p class="map-panel-sub">Venezuela — Red de aceptación descentralizada</p>
-        <div class="map-filters">
-          <div class="filter-label">Filtrar por red:</div>
+        <h3 class="map-panel-title">CriptoMapa Venezuela 🗺️</h3>
+        <p class="map-panel-sub">Comercios que aceptan cripto — filtrar por red</p>
+
+        <div class="map-filters" style="margin-bottom:12px">
+          <div class="filter-label">Red de pago:</div>
           <div class="filter-chips" id="network-filters">
             <button class="chip active" onclick="filterMap('all',this)">Todos</button>
-            <button class="chip" onclick="filterMap('binance',this)">Binance Pay</button>
-            <button class="chip" onclick="filterMap('tron',this)">Tron</button>
-            <button class="chip" onclick="filterMap('lightning',this)">Lightning</button>
+            <button class="chip" onclick="filterMap('TRC-20',this)">TRC-20</button>
+            <button class="chip" onclick="filterMap('BEP-20',this)">BEP-20</button>
+            <button class="chip" onclick="filterMap('Lightning',this)">Lightning</button>
           </div>
         </div>
+
+        <div style="margin-bottom:10px">
+          <button id="btn-gps" onclick="activarGPS()"
+            style="width:100%;padding:9px;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);border-radius:10px;cursor:pointer;font-weight:600;font-size:.85rem">
+            📍 Usar mi ubicación GPS
+          </button>
+        </div>
+
         <div class="map-commerce-list" id="map-commerce-list"></div>
       </div>
+
       <div class="map-container">
         <div id="leaflet-map"></div>
       </div>
     </div>
   </section>
 
-  <!-- ══════ PAGE: SIMPLE PLACEHOLDERS ══════ -->
-  <section class="page" id="page-companies"><div class="placeholder-page"><div class="placeholder-icon">🏢</div><h2>Gestión de Empresas</h2><p>Conecta tu backend en <code>localhost:3001</code> para ver los datos en tiempo real</p><div class="api-endpoint">GET /companies</div></div></section>
-  <section class="page" id="page-employees"><div class="placeholder-page"><div class="placeholder-icon">👥</div><h2>Gestión de Empleados</h2><p>Conecta tu backend en <code>localhost:3001</code> para ver los datos en tiempo real</p><div class="api-endpoint">GET /employees</div></div></section>
-  <section class="page" id="page-advances"><div class="placeholder-page"><div class="placeholder-icon">💳</div><h2>Adelantos Salariales</h2><p>Conecta tu backend en <code>localhost:3001</code> para ver los datos en tiempo real</p><div class="api-endpoint">GET /advances</div></div></section>
-  <section class="page" id="page-reviews"><div class="placeholder-page"><div class="placeholder-icon">💬</div><h2>Sistema de Reseñas</h2><p>Conecta tu backend en <code>localhost:3001</code> para ver los datos en tiempo real</p><div class="api-endpoint">GET /reviews</div></div></section>
+  <!-- ══════ PAGE: COMPANIES ══════ -->
+  <section class="page" id="page-companies">
+    <div class="card">
+      <div class="card-header">
+        <h3>🏢 Empresas Registradas</h3>
+        <span class="card-badge" id="companies-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Empresa</th><th>Ciudad</th><th>Empleados</th><th>Tier</th><th>Estado</th></tr></thead>
+          <tbody id="companies-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: EMPLOYEES ══════ -->
+  <section class="page" id="page-employees">
+    <div class="card">
+      <div class="card-header">
+        <h3>👥 Empleados Activos</h3>
+        <span class="card-badge" id="employees-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Nombre</th><th>Empresa</th><th>Salario Base</th><th>Tier</th><th>Tokens LTK</th></tr></thead>
+          <tbody id="employees-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: ADVANCES ══════ -->
+  <section class="page" id="page-advances">
+    <div class="card">
+      <div class="card-header">
+        <h3>💳 Adelantos Salariales</h3>
+        <span class="card-badge" id="advances-count">Cargando...</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Empleado</th><th>Empresa</th><th>Monto (USD)</th><th>Estado</th><th>Fecha</th></tr></thead>
+          <tbody id="advances-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">⏳ Cargando datos del backend...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ PAGE: REVIEWS ══════ -->
+  <section class="page" id="page-reviews">
+    <div class="card">
+      <div class="card-header">
+        <h3>💬 Sistema de Reseñas</h3>
+        <span class="card-badge" id="reviews-count">Cargando...</span>
+      </div>
+      <div id="reviews-list" style="display:grid;gap:14px;padding:4px">
+        <div style="text-align:center;padding:30px;color:#64748b">⏳ Cargando reseñas del backend...</div>
+      </div>
+    </div>
+  </section>
 
 </main>
 
