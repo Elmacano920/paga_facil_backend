@@ -234,61 +234,74 @@ function abrirModal(id) {
   document.getElementById('modal').classList.remove('hidden');
 }
 
-function actualizarWalletQR(comercioId) {
-  const c = COMERCIOS.find(x => x.id === comercioId);
-  const red = document.getElementById('qr-red')?.value;
-  const walletInput = document.getElementById('qr-wallet');
-  if (!c || !red || !walletInput) return;
-  const wallet = c.wallets[red] || '';
-  walletInput.value = wallet;
-  // Validar automáticamente
-  const fakeInput = { value: wallet };
-  onWalletInput(fakeInput);
-}
+// actualizarWalletQR ya está reemplazada por seleccionarRedQR — se mantiene por compatibilidad
+function actualizarWalletQR(comercioId) { /* compatibilidad — ver seleccionarRedQR */ }
 
 // ══════════════════════════════════════════════════════════
-//  GENERADOR DE QR (Integrante 3)
+//  GENERADOR DE QR — diseño fusionado con qr.html (Integrante 3)
 // ══════════════════════════════════════════════════════════
 function generarQR(comercioId) {
-  const c = COMERCIOS.find(x => x.id === comercioId);
-  const red    = document.getElementById('qr-red').value;
-  const monto  = parseFloat(document.getElementById('qr-monto').value);
+  const c      = COMERCIOS.find(x => x.id === comercioId);
+  const red    = window._redQRActual || c.redes[0];
+  const monto  = parseFloat(document.getElementById('qr-monto')?.value || 0);
   const wallet = c.wallets[red] || '';
+
+  const cuadroQR = document.getElementById('cuadro-qr');
+  const output   = document.getElementById('output-qr');
+  const spinner  = document.getElementById('qr-spinner');
+  const textoQR  = document.getElementById('texto-qr');
+  const btnConf  = document.getElementById('btn-confirmar');
 
   if (!monto || monto <= 0) {
     mostrarToast('⚠️ Ingresa un monto válido', '#ef4444');
     return;
   }
   if (!wallet) {
-    mostrarToast('⚠️ El comercio no tiene wallet para esta red', '#ef4444');
+    mostrarToast('⚠️ Este comercio no tiene wallet para esta red', '#ef4444');
     return;
   }
 
-  // Payload del QR: formato URI estándar para pagos cripto
-  const payload = `pagafacil://pay?merchant=${encodeURIComponent(c.nombre)}&amount=${monto}&wallet=${wallet}&network=${red}&currency=USDT`;
+  // Ocultar anterior y mostrar spinner (igual que qr.html)
+  cuadroQR.style.display = 'none';
+  output.style.display   = 'none';
+  if (btnConf) btnConf.style.display = 'none';
+  spinner.style.display  = 'block';
 
-  const canvas = document.getElementById('qr-canvas');
-  QRCode.toCanvas(canvas, payload, {
-    width: 220,
-    margin: 2,
-    color: { dark: '#7c3aed', light: '#ffffff' },
-    errorCorrectionLevel: 'H',
-  }, (err) => {
-    if (err) { mostrarToast('Error generando QR', '#ef4444'); return; }
-    document.getElementById('qr-container').style.display = 'block';
-    document.getElementById('qr-info').innerHTML =
-      `<strong>${c.nombre}</strong><br>Red: ${red} · Monto: $${monto.toFixed(2)}<br>` +
-      `<span style="color:#64748b">${wallet}</span>`;
-    mostrarToast(`✅ QR generado — $${monto.toFixed(2)} en ${red}`);
-  });
+  setTimeout(() => {
+    spinner.style.display = 'none';
+
+    // Texto unificado: mismo formato de qr.html + datos del comercio
+    const textoUnificado = `${monto}|${red}|${wallet}|${c.nombre}`;
+
+    // Generar QR con qrcodejs (div-based, igual que qr.html)
+    cuadroQR.innerHTML = '';
+    cuadroQR.style.display = 'block';
+    new QRCode(cuadroQR, {
+      text: textoUnificado,
+      width: 185,
+      height: 185,
+      correctLevel: QRCode.CorrectLevel.H,
+    });
+
+    // Mostrar cadena copiable (igual que qr.html)
+    output.style.display = 'block';
+    textoQR.textContent  = textoUnificado;
+
+    // Mostrar botón confirmar pago
+    if (btnConf) btnConf.style.display = 'block';
+
+    mostrarToast(`✅ QR generado — $${monto.toFixed(2)} en ${red}`, '#00ffcc');
+  }, 1000); // spinner de 1 seg como en qr.html
 }
 
-function descargarQR() {
-  const canvas = document.getElementById('qr-canvas');
-  const link = document.createElement('a');
-  link.download = 'criptomapa-pago.png';
-  link.href = canvas.toDataURL();
-  link.click();
+function copiarTextoQR() {
+  const texto = document.getElementById('texto-qr')?.textContent || '';
+  navigator.clipboard.writeText(texto).then(() => {
+    const toast = document.getElementById('toast-qr');
+    if (!toast) return;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 2000);
+  });
 }
 
 // ══════════════════════════════════════════════════════════
@@ -312,7 +325,7 @@ function confirmarPago(comercioId) {
     comercioId,
     comercio: c.nombre,
     monto,
-    red: document.getElementById('qr-red')?.value,
+    red: window._redQRActual || '',  // red seleccionada en el modal
     ltkGanados,
     timestamp: new Date().toISOString(),
   };
@@ -320,14 +333,17 @@ function confirmarPago(comercioId) {
   reseñas.push(reseña);
   localStorage.setItem('reseñas', JSON.stringify(reseñas));
 
-  // Feedback visual
-  document.getElementById('qr-container').innerHTML += `
-    <div style="margin-top:14px;padding:12px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;text-align:center">
-      <div style="font-size:1.5rem">🎉</div>
-      <div style="color:#10b981;font-weight:700;font-size:.9rem">¡Pago confirmado!</div>
-      <div style="color:#6ee7b7;font-size:.8rem;margin-top:4px">+${ltkGanados} LTK acreditados a tu wallet</div>
-      <div style="color:#94a3b8;font-size:.75rem;margin-top:2px">Balance total: ${estado.ltk} LTK</div>
+  // Feedback visual (estilo verde de qr.html)
+  const zona = document.getElementById('output-qr');
+  if (zona) zona.innerHTML += `
+    <div style="margin-top:14px;padding:14px;background:rgba(46,160,67,.12);border:1px solid #2ea043;border-radius:10px;text-align:center">
+      <div style="font-size:1.8rem">🎉</div>
+      <div style="color:#2ea043;font-weight:700;font-size:1rem">¡Pago confirmado!</div>
+      <div style="color:#56d364;font-size:.85rem;margin-top:4px">+${ltkGanados} LTK acreditados a tu wallet</div>
+      <div style="color:#8b949e;font-size:.75rem;margin-top:2px">Balance total: ${estado.ltk} LTK</div>
     </div>`;
+  const btnConf = document.getElementById('btn-confirmar');
+  if (btnConf) btnConf.style.display = 'none';
 
   mostrarToast(`🎉 ¡+${ltkGanados} LTK! Pago en ${c.nombre} confirmado`);
 }
