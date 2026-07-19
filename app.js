@@ -19,11 +19,11 @@ let mapMarkers = [];
 // ─── DEMO DATA ──────────────────────────────────────────────
 const DEMO = {
   activity: [
-    { name: 'Carlos Medina',    company: 'Tech Solutions C.A.', amount: '+$350',  dot: '#8b5cf6', type: 'advance' },
-    { name: 'Ana Rodríguez',    company: 'Grupo Empresarial S.A.', amount: '+$210', dot: '#22d3ee', type: 'cashback' },
-    { name: 'Luis García',      company: 'Inversiones Caribe', amount: '+$520',   dot: '#f59e0b', type: 'advance' },
-    { name: 'María Pérez',      company: 'Corporación Delta', amount: '+25 LTK', dot: '#10b981', type: 'token' },
-    { name: 'José Hernández',   company: 'Tech Solutions C.A.', amount: '+$180',  dot: '#8b5cf6', type: 'advance' },
+    { name: 'Carlos Medina',    company: 'Tech Solutions C.A.',   amount: '+$350',  dot: '#8b5cf6', type: 'advance'  },
+    { name: 'Ana Rodríguez',    company: 'Grupo Empresarial S.A.',amount: '+$210',  dot: '#22d3ee', type: 'cashback' },
+    { name: 'Luis García',      company: 'Inversiones Caribe',    amount: '+$520',  dot: '#f59e0b', type: 'advance'  },
+    { name: 'María Pérez',      company: 'Corporación Delta',     amount: '+25 LTK',dot: '#10b981', type: 'token'    },
+    { name: 'José Hernández',   company: 'Tech Solutions C.A.',   amount: '+$180',  dot: '#8b5cf6', type: 'advance'  },
   ],
   reputationRows: [
     { emp: 'Carlos Medina',  company: 'Tech Solutions C.A.',   score: 94, tier: 'Elite',   rate: '15%' },
@@ -38,35 +38,89 @@ const DEMO = {
     { emp: 'Sofía Castro',   company: 'Grupo Empresarial',     score: 42, tier: 'Plata',    rate: '5%'  },
   ],
   tokenTx: [
-    { type: 'MINT',     emp: 'Carlos Medina',   amount: '+30',  reason: 'CASHBACK_CLAIMED', date: 'hoy 2:14 PM' },
-    { type: 'MINT',     emp: 'Ana Rodríguez',   amount: '+25',  reason: 'FIRST_MONTHLY_USE', date: 'hoy 1:48 PM' },
-    { type: 'BURN',     emp: 'Luis García',     amount: '-50',  reason: 'REDEEMED_BENEFIT',  date: 'hoy 12:33 PM' },
-    { type: 'MINT',     emp: 'María Pérez',     amount: '+10',  reason: 'REVIEW_VERIFIED',   date: 'hoy 11:15 AM' },
-    { type: 'TRANSFER', emp: 'José Hernández',  amount: '85',   reason: 'WALLET_TRANSFER',   date: 'hoy 10:02 AM' },
-    { type: 'MINT',     emp: 'Rosa Martínez',   amount: '+55',  reason: 'TIER_UPGRADE',      date: 'ayer 4:50 PM' },
-    { type: 'MINT',     emp: 'Pedro Jiménez',   amount: '+5',   reason: 'CASHBACK_CLAIMED',  date: 'ayer 3:27 PM' },
+    { type: 'MINT',     emp: 'Carlos Medina',   amount: '+30', reason: 'CASHBACK_CLAIMED',  date: 'hoy 2:14 PM'  },
+    { type: 'MINT',     emp: 'Ana Rodríguez',   amount: '+25', reason: 'FIRST_MONTHLY_USE', date: 'hoy 1:48 PM'  },
+    { type: 'BURN',     emp: 'Luis García',     amount: '-50', reason: 'REDEEMED_BENEFIT',  date: 'hoy 12:33 PM' },
+    { type: 'MINT',     emp: 'María Pérez',     amount: '+10', reason: 'REVIEW_VERIFIED',   date: 'hoy 11:15 AM' },
+    { type: 'TRANSFER', emp: 'José Hernández',  amount: '85',  reason: 'WALLET_TRANSFER',   date: 'hoy 10:02 AM' },
+    { type: 'MINT',     emp: 'Rosa Martínez',   amount: '+55', reason: 'TIER_UPGRADE',      date: 'ayer 4:50 PM' },
+    { type: 'MINT',     emp: 'Pedro Jiménez',   amount: '+5',  reason: 'CASHBACK_CLAIMED',  date: 'ayer 3:27 PM' },
   ],
   cashbackRows: [
-    { emp: 'Carlos Medina',  amount: '$350', cb: '$52.50', tier: 'Elite',   rate: '15%', ltk: 30,  date: 'hoy 2:14 PM' },
-    { emp: 'Ana Rodríguez',  amount: '$210', cb: '$25.20', tier: 'Platino', rate: '12%', ltk: 30,  date: 'hoy 1:48 PM' },
-    { emp: 'Luis García',    amount: '$520', cb: '$41.60', tier: 'Oro',     rate: '8%',  ltk: 5,   date: 'hoy 12:33 PM' },
-    { emp: 'María Pérez',    amount: '$180', cb: '$21.60', tier: 'Platino', rate: '12%', ltk: 5,   date: 'hoy 11:15 AM' },
-    { emp: 'José Hernández', amount: '$300', cb: '$24.00', tier: 'Oro',     rate: '8%',  ltk: 5,   date: 'ayer 5:10 PM' },
-    { emp: 'Rosa Martínez',  amount: '$450', cb: '$22.50', tier: 'Oro',     rate: '5%',  ltk: 5,   date: 'ayer 4:00 PM' },
+    { emp: 'Carlos Medina',  amount: '$350', cb: '$52.50', tier: 'Elite',   rate: '15%', ltk: 30, date: 'hoy 2:14 PM'   },
+    { emp: 'Ana Rodríguez',  amount: '$210', cb: '$25.20', tier: 'Platino', rate: '12%', ltk: 30, date: 'hoy 1:48 PM'   },
+    { emp: 'Luis García',    amount: '$520', cb: '$41.60', tier: 'Oro',     rate: '8%',  ltk: 5,  date: 'hoy 12:33 PM'  },
+    { emp: 'María Pérez',    amount: '$180', cb: '$21.60', tier: 'Platino', rate: '12%', ltk: 5,  date: 'hoy 11:15 AM'  },
+    { emp: 'José Hernández', amount: '$300', cb: '$24.00', tier: 'Oro',     rate: '8%',  ltk: 5,  date: 'ayer 5:10 PM'  },
+    { emp: 'Rosa Martínez',  amount: '$450', cb: '$22.50', tier: 'Oro',     rate: '5%',  ltk: 5,  date: 'ayer 4:00 PM'  },
   ],
   comercios: [
-    { name: 'TechStore Caracas',      city: 'Caracas',                lat: 10.4880, lng: -66.8792, nets: ['Binance Pay','USDT'],      verified: true  },
-    { name: 'Café Cripto',            city: 'Caracas',                lat: 10.5000, lng: -66.9200, nets: ['Lightning','Bitcoin'],     verified: true  },
-    { name: 'Farmacia Digital',       city: 'Caracas',                lat: 10.4720, lng: -66.8620, nets: ['Tron','USDT'],            verified: false },
-    { name: 'Restaurante El Bloque',  city: 'San Juan de los Morros', lat: 9.9100,  lng: -67.3500, nets: ['Binance Pay'],            verified: true  },
-    { name: 'Librería Token',         city: 'Caracas',                lat: 10.4810, lng: -66.8850, nets: ['Lightning','Binance Pay'], verified: true  },
-    { name: 'Supermercado Satoshi',   city: 'Valencia',               lat: 10.1800, lng: -67.9900, nets: ['Bitcoin','USDT'],         verified: false },
-    { name: 'Hotel Cripto Suites',    city: 'Caracas',                lat: 10.5100, lng: -66.9100, nets: ['Tron','Binance Pay'],     verified: true  },
-    { name: 'Clínica Web3',           city: 'Maracay',                lat: 10.2400, lng: -67.5900, nets: ['USDT','Tron'],            verified: false },
-    { name: 'Electrónica DeFi',       city: 'Caracas',                lat: 10.4930, lng: -66.8700, nets: ['Lightning'],              verified: true  },
-    { name: 'Peluquería NFT',         city: 'Barquisimeto',           lat: 10.0700, lng: -69.3200, nets: ['Binance Pay'],            verified: false },
-    { name: 'Auto Parts Blockchain',  city: 'Caracas',                lat: 10.4650, lng: -66.9050, nets: ['Bitcoin','Tron'],         verified: true  },
-  ]
+    { name: 'TechStore Caracas',     city: 'Caracas',                lat: 10.4880, lng: -66.8792, nets: ['Binance Pay','USDT'],      verified: true  },
+    { name: 'Café Cripto',           city: 'Caracas',                lat: 10.5000, lng: -66.9200, nets: ['Lightning','Bitcoin'],     verified: true  },
+    { name: 'Farmacia Digital',      city: 'Caracas',                lat: 10.4720, lng: -66.8620, nets: ['Tron','USDT'],            verified: false },
+    { name: 'Restaurante El Bloque', city: 'San Juan de los Morros', lat: 9.9100,  lng: -67.3500, nets: ['Binance Pay'],            verified: true  },
+    { name: 'Librería Token',        city: 'Caracas',                lat: 10.4810, lng: -66.8850, nets: ['Lightning','Binance Pay'], verified: true  },
+    { name: 'Supermercado Satoshi',  city: 'Valencia',               lat: 10.1800, lng: -67.9900, nets: ['Bitcoin','USDT'],         verified: false },
+    { name: 'Hotel Cripto Suites',   city: 'Caracas',                lat: 10.5100, lng: -66.9100, nets: ['Tron','Binance Pay'],     verified: true  },
+    { name: 'Clínica Web3',          city: 'Maracay',                lat: 10.2400, lng: -67.5900, nets: ['USDT','Tron'],            verified: false },
+    { name: 'Electrónica DeFi',      city: 'Caracas',                lat: 10.4930, lng: -66.8700, nets: ['Lightning'],              verified: true  },
+    { name: 'Peluquería NFT',        city: 'Barquisimeto',           lat: 10.0700, lng: -69.3200, nets: ['Binance Pay'],            verified: false },
+    { name: 'Auto Parts Blockchain', city: 'Caracas',                lat: 10.4650, lng: -66.9050, nets: ['Bitcoin','Tron'],         verified: true  },
+  ],
+
+  // ── Datos de ejemplo para tablas (cuando API está vacía) ──
+  companies: [
+    { name: 'Tech Solutions C.A.',      city: 'Caracas',                employees: 87,  tier: 'Elite',   active: true  },
+    { name: 'Grupo Empresarial S.A.',   city: 'Caracas',                employees: 54,  tier: 'Platino', active: true  },
+    { name: 'Inversiones Caribe',       city: 'Maracay',                employees: 41,  tier: 'Oro',     active: true  },
+    { name: 'Corporación Delta C.A.',   city: 'Valencia',               employees: 63,  tier: 'Platino', active: true  },
+    { name: 'Desarrollos Andinos',      city: 'San Cristóbal',          employees: 28,  tier: 'Oro',     active: true  },
+    { name: 'Distribuidora El Llano',   city: 'San Juan de los Morros', employees: 19,  tier: 'Plata',   active: true  },
+    { name: 'Consultores TIC 360',      city: 'Caracas',                employees: 32,  tier: 'Oro',     active: true  },
+    { name: 'Agroindustrias del Sur',   city: 'Barquisimeto',           employees: 15,  tier: 'Bronce',  active: false },
+  ],
+
+  employees: [
+    { name: 'Carlos Medina',     company: 'Tech Solutions C.A.',    salary: 1200, tier: 'Elite',   ltk: 340 },
+    { name: 'Ana Rodríguez',     company: 'Grupo Empresarial S.A.', salary: 980,  tier: 'Platino', ltk: 210 },
+    { name: 'Luis García',       company: 'Inversiones Caribe',     salary: 850,  tier: 'Platino', ltk: 175 },
+    { name: 'María Pérez',       company: 'Corporación Delta C.A.', salary: 920,  tier: 'Platino', ltk: 195 },
+    { name: 'José Hernández',    company: 'Tech Solutions C.A.',    salary: 760,  tier: 'Oro',     ltk: 130 },
+    { name: 'Rosa Martínez',     company: 'Grupo Empresarial S.A.', salary: 700,  tier: 'Oro',     ltk: 115 },
+    { name: 'Pedro Jiménez',     company: 'Inversiones Caribe',     salary: 680,  tier: 'Oro',     ltk: 98  },
+    { name: 'Elena Torres',      company: 'Corporación Delta C.A.', salary: 740,  tier: 'Oro',     ltk: 122 },
+    { name: 'Miguel Flores',     company: 'Tech Solutions C.A.',    salary: 620,  tier: 'Plata',   ltk: 60  },
+    { name: 'Sofía Castro',      company: 'Grupo Empresarial S.A.', salary: 590,  tier: 'Plata',   ltk: 45  },
+    { name: 'Roberto Salazar',   company: 'Desarrollos Andinos',    salary: 550,  tier: 'Plata',   ltk: 38  },
+    { name: 'Gabriela Morales',  company: 'Distribuidora El Llano', salary: 480,  tier: 'Bronce',  ltk: 15  },
+    { name: 'Andrés Rojas',      company: 'Consultores TIC 360',    salary: 870,  tier: 'Oro',     ltk: 140 },
+    { name: 'Valentina Núñez',   company: 'Tech Solutions C.A.',    salary: 1050, tier: 'Platino', ltk: 220 },
+    { name: 'Diego Contreras',   company: 'Inversiones Caribe',     salary: 730,  tier: 'Oro',     ltk: 110 },
+  ],
+
+  advances: [
+    { employee: 'Carlos Medina',    company: 'Tech Solutions C.A.',    amount: 350,  status: 'DISBURSED', date: '19/07/2026' },
+    { employee: 'Ana Rodríguez',    company: 'Grupo Empresarial S.A.', amount: 210,  status: 'DISBURSED', date: '19/07/2026' },
+    { employee: 'Luis García',      company: 'Inversiones Caribe',     amount: 520,  status: 'DISBURSED', date: '18/07/2026' },
+    { employee: 'María Pérez',      company: 'Corporación Delta C.A.', amount: 180,  status: 'PENDING',   date: '19/07/2026' },
+    { employee: 'José Hernández',   company: 'Tech Solutions C.A.',    amount: 300,  status: 'DISBURSED', date: '17/07/2026' },
+    { employee: 'Rosa Martínez',    company: 'Grupo Empresarial S.A.', amount: 450,  status: 'DISBURSED', date: '17/07/2026' },
+    { employee: 'Pedro Jiménez',    company: 'Inversiones Caribe',     amount: 280,  status: 'APPROVED',  date: '19/07/2026' },
+    { employee: 'Elena Torres',     company: 'Corporación Delta C.A.', amount: 400,  status: 'DISBURSED', date: '16/07/2026' },
+    { employee: 'Miguel Flores',    company: 'Tech Solutions C.A.',    amount: 150,  status: 'PENDING',   date: '19/07/2026' },
+    { employee: 'Valentina Núñez',  company: 'Tech Solutions C.A.',    amount: 600,  status: 'DISBURSED', date: '15/07/2026' },
+  ],
+
+  reviews: [
+    { comercio: 'Farmacia Salud Plus',    red: 'TRC-20',    monto: 45,   rating: 5, ltk: 10, date: '19/07/2026' },
+    { comercio: 'Supermercado FreshMart', red: 'BEP-20',    monto: 120,  rating: 5, ltk: 25, date: '19/07/2026' },
+    { comercio: 'Librería Cultural',      red: 'Lightning', monto: 18,   rating: 4, ltk: 5,  date: '18/07/2026' },
+    { comercio: 'Restaurante La Arepa',   red: 'BEP-20',    monto: 35,   rating: 4, ltk: 5,  date: '18/07/2026' },
+    { comercio: 'Bodegón Cripto Guárico', red: 'TRC-20',    monto: 65,   rating: 5, ltk: 25, date: '17/07/2026' },
+    { comercio: 'Panadería El Trigo',     red: 'TRC-20',    monto: 12,   rating: 3, ltk: 5,  date: '17/07/2026' },
+    { comercio: 'Farmacia San Juan',      red: 'BEP-20',    monto: 90,   rating: 5, ltk: 10, date: '16/07/2026' },
+    { comercio: 'Taller Mecánico Veloz',  red: 'Lightning', monto: 200,  rating: 4, ltk: 25, date: '15/07/2026' },
+  ],
 };
 
 // Tier color helper
@@ -670,82 +724,74 @@ async function loadCompanies() {
   const tbody = document.getElementById('companies-tbody');
   const badge = document.getElementById('companies-count');
   if (!tbody) return;
-  const data = await apiFetch('/companies');
-  if (!data || !data.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">📭 Sin datos aún — la BD está vacía. <a href="${API}/api/docs" target="_blank" style="color:#8b5cf6">Crear desde Swagger</a></td></tr>`;
-    if (badge) badge.textContent = '0 empresas';
-    return;
-  }
-  if (badge) badge.textContent = `${data.length} empresas`;
+  let data = await apiFetch('/companies');
+  const isDemo = !data || !data.length;
+  if (isDemo) data = DEMO.companies;
+  if (badge) badge.textContent = `${data.length} empresas${isDemo ? ' — Demo' : ''}`;
+  const stColors = { true: '#10b981', false: '#ef4444' };
   tbody.innerHTML = data.map((c, i) => `<tr>
     <td style="color:#8b5cf6">${i+1}</td>
     <td><strong>${c.name || c.nombre || '—'}</strong></td>
     <td style="color:#94a3b8">${c.city || c.ciudad || '—'}</td>
-    <td>${c.employeeCount ?? c.employees?.length ?? '—'}</td>
+    <td style="color:#22d3ee">${c.employees || c.employeeCount || '—'}</td>
     <td>${tierPill(c.tier || 'Bronce')}</td>
-    <td><span style="color:${c.active!==false?'#10b981':'#ef4444'}">${c.active!==false?'✓ Activa':'✕ Inactiva'}</span></td>
+    <td><span style="color:${c.active !== false ? '#10b981' : '#ef4444'};font-weight:600">${c.active !== false ? '✓ Activa' : '✕ Inactiva'}</span></td>
   </tr>`).join('');
+  if (isDemo) tbody.innerHTML += `<tr><td colspan="6" style="text-align:center;font-size:.75rem;color:#4a5568;padding:8px;border-top:1px solid rgba(255,255,255,.05)">⚠️ Datos de ejemplo — conecta el backend para ver datos reales</td></tr>`;
 }
 
 async function loadEmployees() {
   const tbody = document.getElementById('employees-tbody');
   const badge = document.getElementById('employees-count');
   if (!tbody) return;
-  const data = await apiFetch('/employees');
-  if (!data || !data.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">📭 Sin empleados aún. <a href="${API}/api/docs" target="_blank" style="color:#8b5cf6">Agregar desde Swagger</a></td></tr>`;
-    if (badge) badge.textContent = '0 empleados';
-    return;
-  }
-  if (badge) badge.textContent = `${data.length} empleados`;
+  let data = await apiFetch('/employees');
+  const isDemo = !data || !data.length;
+  if (isDemo) data = DEMO.employees;
+  if (badge) badge.textContent = `${data.length} empleados${isDemo ? ' — Demo' : ''}`;
   tbody.innerHTML = data.map((e, i) => `<tr>
     <td style="color:#22d3ee">${i+1}</td>
     <td><strong>${e.name || e.nombre || '—'}</strong></td>
-    <td style="color:#94a3b8">${e.company?.name || e.companyName || '—'}</td>
-    <td style="color:#f59e0b">$${(e.baseSalary || e.salary || 0).toLocaleString('es-VE')}</td>
+    <td style="color:#94a3b8">${e.company?.name || e.companyName || e.company || '—'}</td>
+    <td style="color:#f59e0b;font-weight:600">$${(e.baseSalary || e.salary || 0).toLocaleString('es-VE')}</td>
     <td>${tierPill(e.reputationTier || e.tier || 'Bronce')}</td>
-    <td style="color:#c4b5fd;font-weight:700">${e.ltkBalance || e.tokens || 0} LTK</td>
+    <td style="color:#c4b5fd;font-weight:700">${e.ltkBalance || e.tokens || e.ltk || 0} LTK</td>
   </tr>`).join('');
+  if (isDemo) tbody.innerHTML += `<tr><td colspan="6" style="text-align:center;font-size:.75rem;color:#4a5568;padding:8px;border-top:1px solid rgba(255,255,255,.05)">⚠️ Datos de ejemplo — conecta el backend para ver datos reales</td></tr>`;
 }
 
 async function loadAdvances() {
   const tbody = document.getElementById('advances-tbody');
   const badge = document.getElementById('advances-count');
   if (!tbody) return;
-  const data = await apiFetch('/advances');
-  if (!data || !data.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b">📭 Sin adelantos registrados. <a href="${API}/api/docs" target="_blank" style="color:#8b5cf6">Crear desde Swagger</a></td></tr>`;
-    if (badge) badge.textContent = '0 adelantos';
-    return;
-  }
-  if (badge) badge.textContent = `${data.length} adelantos`;
+  let data = await apiFetch('/advances');
+  const isDemo = !data || !data.length;
+  if (isDemo) data = DEMO.advances;
+  if (badge) badge.textContent = `${data.length} adelantos${isDemo ? ' — Demo' : ''}`;
   const stColors = { DISBURSED:'#10b981', PENDING:'#f59e0b', FAILED:'#ef4444', APPROVED:'#22d3ee' };
   tbody.innerHTML = data.map((a, i) => {
     const st = a.status || 'PENDING';
     return `<tr>
       <td style="color:#f59e0b">${i+1}</td>
-      <td><strong>${a.employee?.name || a.employeeName || a.employeeId || '—'}</strong></td>
-      <td style="color:#94a3b8">${a.company?.name || a.companyName || '—'}</td>
-      <td style="color:#6ee7b7;font-weight:700">$${(a.amount||0).toLocaleString('es-VE')}</td>
+      <td><strong>${a.employee?.name || a.employeeName || a.employee || '—'}</strong></td>
+      <td style="color:#94a3b8">${a.company?.name || a.companyName || a.company || '—'}</td>
+      <td style="color:#6ee7b7;font-weight:700">$${(a.amount || 0).toLocaleString('es-VE')}</td>
       <td><span style="color:${stColors[st]||'#94a3b8'};font-weight:700">${st}</span></td>
-      <td style="color:#64748b">${a.createdAt ? new Date(a.createdAt).toLocaleDateString('es-VE') : '—'}</td>
+      <td style="color:#64748b">${a.createdAt ? new Date(a.createdAt).toLocaleDateString('es-VE') : a.date || '—'}</td>
     </tr>`;
   }).join('');
+  if (isDemo) tbody.innerHTML += `<tr><td colspan="6" style="text-align:center;font-size:.75rem;color:#4a5568;padding:8px;border-top:1px solid rgba(255,255,255,.05)">⚠️ Datos de ejemplo — conecta el backend para ver datos reales</td></tr>`;
 }
 
 async function loadReviews() {
   const list  = document.getElementById('reviews-list');
   const badge = document.getElementById('reviews-count');
   if (!list) return;
-  // También muestra las reseñas locales del CriptoMapa
   const localReviews = JSON.parse(localStorage.getItem('reseñas') || '[]');
   const apiReviews   = await apiFetch('/reviews') || [];
-  const all = [...apiReviews, ...localReviews].slice(0, 20);
-  if (badge) badge.textContent = `${all.length} reseñas`;
-  if (!all.length) {
-    list.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b">📭 Sin reseñas aún — confirma un pago en el CriptoMapa para generar la primera.</div>';
-    return;
-  }
+  let all = [...apiReviews, ...localReviews];
+  const isDemo = !all.length;
+  if (isDemo) all = DEMO.reviews;
+  if (badge) badge.textContent = `${all.length} reseñas${isDemo ? ' — Demo' : ''}`;
   const stars = n => '★'.repeat(Math.min(5,Math.max(1,n||5))) + '☆'.repeat(5-Math.min(5,Math.max(1,n||5)));
   list.innerHTML = all.map(r => `
     <div style="padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px">
@@ -755,10 +801,11 @@ async function loadReviews() {
       </div>
       <div style="font-size:.8rem;color:#64748b">
         ${r.red ? `Red: <span style="color:#8b5cf6">${r.red}</span> · ` : ''}Monto: <span style="color:#10b981">$${r.monto || r.amount || '—'}</span>
-        ${r.ltkGanados ? ` · <span style="color:#c4b5fd">+${r.ltkGanados} LTK</span>` : ''}
-        ${r.timestamp ? ` · ${new Date(r.timestamp).toLocaleDateString('es-VE')}` : ''}
+        ${r.ltkGanados || r.ltk ? ` · <span style="color:#c4b5fd">+${r.ltkGanados || r.ltk} LTK</span>` : ''}
+        ${r.date ? ` · ${r.date}` : r.timestamp ? ` · ${new Date(r.timestamp).toLocaleDateString('es-VE')}` : ''}
       </div>
     </div>`).join('');
+  if (isDemo) list.innerHTML += `<div style="text-align:center;font-size:.75rem;color:#4a5568;padding:10px">⚠️ Datos de ejemplo — confirma un pago en el CriptoMapa para ver reseñas reales</div>`;
 }
 
 // ─── INIT ────────────────────────────────────────────────────
